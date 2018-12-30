@@ -1,12 +1,12 @@
 #include<iostream>
 
-struct Node{
-    int data;
-    struct Node* next;
-};
-
 class Sll{
-    Node *start;
+    struct Node{
+        int data;
+        struct Node* next;
+
+        Node(int d): data(d), next(NULL) {}
+    } *start;
 
 public:
     Sll() : start(NULL) {}
@@ -20,14 +20,14 @@ int main(){
     // Start with the empty list
     Sll list;
     
-    // Create a list 10 20 30 40 50
+    // Create a list: 10 20 30 40 50
     for(int i = 50; i> 0; i-= 10)
         list.push(i);
     
     std::cout<<"Given Linked List is: ";
     list.display();
 
-    // Rotating the lsit by 3 for example
+    // Rotating the list by 3 for example
     list.rotate(3);
     std::cout<<"\nRotated Linked List is: ";
     list.display();
@@ -37,11 +37,8 @@ int main(){
 }
 
 void Sll::push(int data){
-    // allocate node
-    Node *new_node = new Node;
-
-    // put in the data
-    new_node->data = data;
+    // allocate node and put in the data
+    Node *new_node = new Node(data);
 
     // link the old list to the new node
     new_node->next = start;
@@ -71,7 +68,7 @@ void Sll::rotate(int key){
         count++;
     }
 
-    // If current is NUll, k is greater than tge size of the linked list, so no chagne occurs
+    // If current is NUll, key is greater than tge size of the linked list, so no chagne occurs
     if(!cur)
         return;
 
