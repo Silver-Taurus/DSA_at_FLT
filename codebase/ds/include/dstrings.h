@@ -1,5 +1,5 @@
 // Include files
-#include "../types.h"
+#include "types.h"
 
 #ifndef __DSTRING__
 #define __DSTRING__
@@ -15,6 +15,9 @@ typedef struct dstrings {
 
 // Creating macros for constants to be used in program
 #define STR_LEN 8
+
+// Creating macros for functionality to be used in program
+#define display_string(str) STROUT(str->content)
 
 /* ---------- Function Prototypes ---------- */
 // Function to create a new dynamic string
