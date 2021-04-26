@@ -17,7 +17,7 @@ typedef struct dstrings {
 #define STR_LEN 8
 
 // Creating macros for functionality to be used in program
-#define display_string(str) STROUT(str->content)
+#define display_string(str) strout(str->content)
 
 /* ---------- Function Prototypes ---------- */
 // Function to create a new dynamic string
