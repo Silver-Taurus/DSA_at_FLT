@@ -20,9 +20,14 @@ LIBS		=
 # Define the C source files
 SRCS		=	src/dstrings.c
 
-# Create object files for source files
+# Define the C object files for the source files
+# Also, creates object files from the source due to the
+# predefined .c.o functionality of GNU make which can be
+# overridden as done below
 SRC_OBJS	=	$(SRCS:.c=.o)
-OBJS		=	obj/dstrings.o
+
+# Define the C object files in a different location
+OBJS 		= 	$(SRC_OBJS:src/%.o=obj/%.o)
 
 # Define the C test files
 TEST_SRCS	=	test/dstrings_test.c
@@ -30,8 +35,9 @@ TEST_SRCS	=	test/dstrings_test.c
 # Create object files for test files
 TEST_OBJS	=	$(TEST_SRCS:.c=.o)	
 
-# Define the executable file names (test files)
-TEST_NAMES	=	run/dstrings
+# Define the executable file names (test files) based on test
+# soruce files
+TEST_NAMES	=	run/dstrings_test
 
 
 # ----- Functionality -----
@@ -42,17 +48,21 @@ TEST_NAMES	=	run/dstrings
 # Create executables for test files and clean test objs
 clean_test_run: clean_all_files test_run 
 
+# Create object files from source files as well as make
+# executable for test files
+all_run: src_run test_run
+
 # Create executables for test files
-test_run: src_run $(TEST_NAMES) clean_test_objs
+test_run: $(TEST_NAMES) clean_test_objs
 
 # Create only object files for the source files
-src_run: $(SRC_OBJS) move_src_objs
+src_run: $(SRC_OBJS) $(OBJS) $(TEST_NAMES)
 
-# Move source object files to obj directory
-move_src_objs:
+# Create object files in the obj folder - perform move operation 
+$(OBJS):
 	$(MV) src/*.o obj/
 
-# Make executables for each test file
+# Make executables for each test source file
 $(TEST_NAMES) : $(TEST_OBJS)
 	$(CC) $(CFLAGS) $(INCLUDES) $(LDFLAGS) $(LIBS) -o $(TEST_NAMES) $(TEST_OBJS) $(OBJS)
 

@@ -13,7 +13,7 @@ str_t* create_string () {
     
     // Creating the content field amd then initialize it
     new_string->content = (CHAR *) malloc(sizeof(CHAR) * new_string->cap);
-    memset(new_string->content, 0, sizeof(*new_string->content));
+    memset(new_string->content, 0, sizeof(CHAR) * new_string->cap);
 
     return new_string;
 }
@@ -27,15 +27,17 @@ void extend_string (str_t *string) {
 
     // Creating a new content and initialize it
     new_content = (CHAR *) malloc(sizeof(CHAR) * string->cap);
-    memset(new_content, 0, sizeof(*new_content));
+
+    memset(new_content, 0, sizeof(CHAR) * string->cap);
 
     // Copy the data of content field of string to new content
-    memcpy(new_content, string->content, sizeof(*string->content));
+    for (INT index = 0; index < string->length; index++)
+        new_content[index] = string->content[index];
 
     // Free the original content data and set new content to the field
     free(string->content);
     string->content = new_content;
-}
+    }
 
 void input_string (str_t *string) {
     // Declare the input character

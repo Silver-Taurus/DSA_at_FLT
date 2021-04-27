@@ -11,7 +11,7 @@ typedef char CHAR;
 #define STR_FS "%s"
 
 // Creating macros for functionality to be used in program
-#define strout(str) fprintf(stdout, str)
+#define strout(str) fprintf(stdout, STR_FS, str)
 #define out(format, data) fprintf(stdout, format, data)
 #define nl() fprintf(stdout, "\n")
 
