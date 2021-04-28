@@ -45,9 +45,6 @@ TEST_NAMES	=	run/dstrings_test
 .c.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-# Create executables for test files and clean test objs
-clean_test_run: clean_all_files test_run 
-
 # Create object files from source files as well as make
 # executable for test files
 all_run: src_run test_run

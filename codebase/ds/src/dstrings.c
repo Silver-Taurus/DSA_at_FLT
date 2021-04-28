@@ -13,8 +13,8 @@ str_t* create_string () {
     new_string->length = 0;
     
     // Creating the content field amd then initialize it
-    new_string->content = (CHAR *) malloc(str_cap(new_string));
-    memset(new_string->content, 0, str_cap(new_string));
+    new_string->content = (CHAR *) malloc(str_csize(new_string));
+    memset(new_string->content, 0, str_csize(new_string));
 
     return new_string;
 }
@@ -27,8 +27,8 @@ void extend_string (str_t *string) {
     string->cap *= 2;
 
     // Creating a new content and initialize it
-    new_content = (CHAR *) malloc(str_cap(string));
-    memset(new_content, 0, str_cap(string));
+    new_content = (CHAR *) malloc(str_csize(string));
+    memset(new_content, 0, str_csize(string));
 
     // Copy the data of content field of string to new content
     for (INT index = 0; index < string->length; index++)
@@ -100,14 +100,16 @@ void set_string (str_t *string, CHAR *content) {
         string->cap *= 2;
     
     // Create a new content
-    string->content = (CHAR *) malloc(str_cap(string));
+    string->content = (CHAR *) malloc(str_csize(string));
 
     // Initialize it with 0
-    memset(string->content, 0, str_cap(string));
+    memset(string->content, 0, str_csize(string));
         
-    // Now set the content to the string's content
+    // Now set the content to the string's conten
     for (index = 0; index < length; index++)
-        string->content[index] = content[index];
+        string->content[string->length++] = content[index];
+    
+    string->content[string->length] = '\0';
 }
 
 str_t* create_string_wd (CHAR *content) {
@@ -116,7 +118,7 @@ str_t* create_string_wd (CHAR *content) {
 
     // Initialize the new string length field
     new_string->length = 0;
-
+    
     // set the content
     set_string(new_string, content);
 

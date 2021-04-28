@@ -17,7 +17,7 @@ typedef struct dstrings {
 #define STR_LEN 8
 
 // Creating macros for functionality to be used in program
-#define str_cap(str) (sizeof(CHAR) * str->cap)
+#define str_csize(str) (sizeof(CHAR) * str->cap)
 #define calc_content_len(content, len) while (content[len++] != '\0');
 #define display_string(str) strout(str->content)
 #define c_is_Alpha(c) (c >= 'A' && c <= 'Z')
