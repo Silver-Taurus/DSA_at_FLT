@@ -59,9 +59,8 @@ void input_string (str_t *string) {
 }
 
 void append_string (str_t *string, CHAR *content) {
-    // Declare the transfer character, content index and content length
-    CHAR ch;
-    INT index = 0, length = 0;
+    // Declare the content index and content length
+    INT index, length = 0;
 
     // Find the length of the content
     calc_content_len(content, length);
@@ -71,8 +70,11 @@ void append_string (str_t *string, CHAR *content) {
         extend_string(string);
 
     // Now append the content to the string's content
+    if (string->length > 0)
+        string->length -= 1;
+
     for (index = 0; index < length; index++)
-        string->content[string->length + index] = content[index];
+        string->content[string->length++] = content[index];
 }
 
 void set_string (str_t *string, CHAR *content) {
