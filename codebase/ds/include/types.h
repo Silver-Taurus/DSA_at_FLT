@@ -15,4 +15,10 @@ typedef char CHAR;
 #define out(format, data) fprintf(stdout, format, data)
 #define nl() fprintf(stdout, "\n")
 
+// Creating a boolean enum
+typedef enum boolen {
+    false,
+    true
+} bool_t;
+
 #endif

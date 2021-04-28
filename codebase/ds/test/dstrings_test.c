@@ -22,5 +22,8 @@ INT main (void) {
     display_string(string);
     nl();
 
+    /* ----- Check for check_pangram ----- */
+    
+
     return 0;
 }
