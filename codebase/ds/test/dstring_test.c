@@ -15,12 +15,12 @@ INT cases, pass, idx;
 CHAR failed_cases[8];
 
 /* ---------- Macros to define functionalities to be used ---------- */
-#define print_header(msg) fprintf(stdout, "Case - %-20s: ", msg)
+#define print_header(msg) fprintf(stdout, "Case - %-25s: ", msg)
 #define fc_init() bzero(failed_cases, TCASES)
 #define test_case(expr, idx) if (expr) pass++; else failed_cases[idx] = 1; idx++
 
-#define p_success() fprintf(stdout, "%s%20s%s", COLOR_OK, "SUCCESS... ", COLOR_NRM)
-#define p_failure() fprintf(stdout, "%s%20s%s", COLOR_ERR, "FAILURE... ", COLOR_NRM)
+#define p_success() fprintf(stdout, "%s%25s%s", COLOR_OK, "SUCCESS... ", COLOR_NRM)
+#define p_failure() fprintf(stdout, "%s%25s%s", COLOR_ERR, "FAILURE... ", COLOR_NRM)
 #define count() fprintf(stdout, "%d / %d cases passed.", pass, cases)
 
 
@@ -76,8 +76,15 @@ INT main (void) {
         "remove_ch_string",
         "remove_btw_string",
         "remove_from_string",
+        "remove_at_string",
         "remove_in_string",
-        "check_pangram_lipogram"
+        "remove_all_in_string",
+        "count_uc_string",
+        "count_lc_string",
+        "count_num_string",
+        "count_spc_string",
+        "check_pangram_lipogram",
+        "min_window_substr"
     };
 
 
@@ -274,8 +281,6 @@ INT main (void) {
     substr = create_string_wc("llys");
     positions = substr_all_in_string(string, substr, false);
     test_case(positions == NULL, idx);                          // case-8
-    
-    free(substr);
     show_result();
 
 
@@ -369,7 +374,7 @@ INT main (void) {
 
     /* ----- Check for remove_from_string ----- */
     pass = 0; cases = 7, idx = 0;
-    print_header(msgs[13]);
+    print_header(msgs[14]);
     
     CHAR s18[] = "new tin";
 
@@ -385,33 +390,167 @@ INT main (void) {
     show_result();
 
 
-    // /* ----- Check for remove_in_string ----- */
-    // pass = 0; cases = 2;
-    // print_header(msgs[12]);
-    // CHAR fs3[] = "the new string";
-    // free(substr);
-    // substr = create_string_wc(" finally");
-    // remove_in_string(string, substr, true);
-    // test_case(strcmp(string->content, fs1) == 0);
-    // free(substr);
-    // substr = create_string_wc("set ");
-    // remove_in_string(string, substr, false);
-    // test_case(strcmp(string->content, fs3) == 0);
-    // show_result();
+    /* ----- Check for remove_at_string ----- */
+    pass = 0; cases = 7, idx = 0;
+    print_header(msgs[15]);
+    
+    CHAR s19[] = "new";
 
-    // /* ----- Check for check_pangram ----- */
-    // pass = 0; cases = 3;
-    // print_header(msgs[13]);
-    // CHAR ps1[] = "The quick brown fox jumps over the lazy dog";
-    // CHAR ps2[] = "The quick brown fox jumped over the lazy dog";
-    // test_case(check_pangram_lipogram(string, false, false) == 0);
-    // free(string);
-    // string = create_string_wc(ps1);
-    // test_case(check_pangram_lipogram(string, false, false) == 1);
-    // free(string);
-    // string = create_string_wc(ps2);
-    // test_case(check_pangram_lipogram(string, true, false) == 2);
-    // show_result();
+    test_case(remove_from_string(string, 3) == true, idx);      // case-1
+    test_case(strcmp(string->content, s19) == 0, idx);          // case-2
+    test_case(string->length == 3, idx);                        // case-3
+
+    test_case(remove_from_string(string, -1) == false, idx);    // case-4
+    test_case(strcmp(string->content, s19) == 0, idx);          // case-5
+
+    test_case(remove_from_string(string, 6) == false, idx);     // case-6
+    test_case(strcmp(string->content, s19) == 0, idx);          // case-7
+    show_result();
+
+
+    /* ----- Check for remove_in_string ----- */
+    pass = 0; cases = 6, idx = 0;
+    print_header(msgs[16]);
+
+    CHAR s20[] = "Set the new string";
+    CHAR s21[] = "the new string";
+    
+    free(substr);
+    free(string);
+    string = create_string_wc(s6);
+    substr = create_string_wc(" finally");
+    remove_in_string(string, substr, true);
+    test_case(strcmp(string->content, s20) == 0, idx);          // case-1
+    test_case(string->length == 18, idx);                       // case-2
+
+    free(substr);
+    substr = create_string_wc("set ");
+    remove_in_string(string, substr, true);
+    test_case(strcmp(string->content, s20) == 0, idx);          // case-3
+    test_case(string->length == 18, idx);                       // case-4   
+
+    remove_in_string(string, substr, false);
+    test_case(strcmp(string->content, s21) == 0, idx);          // case-5
+    test_case(string->length == 14, idx);                       // case-6    
+    show_result();
+
+
+    /* ----- Check for remove_all_in_string ----- */
+    pass = 0; cases = 6, idx = 0;
+    print_header(msgs[17]);
+
+    CHAR s22[] = "Set the new string finally to be set ";
+    CHAR s23[] = "Set the new strg fally to be set ";
+    CHAR s24[] = "the new strg fally to be ";
+    
+    free(substr);
+    free(string);
+    string = create_string_wc(s22);
+    substr = create_string_wc("in");
+    remove_all_in_string(string, substr, true);
+    test_case(strcmp(string->content, s23) == 0, idx);          // case-1
+    test_case(string->length == 33, idx);                       // case-2
+
+    free(substr);
+    substr = create_string_wc("set ");
+    remove_all_in_string(string, substr, false);
+    test_case(strcmp(string->content, s24) == 0, idx);          // case-3
+    test_case(string->length == 25, idx);                       // case-4   
+
+    remove_all_in_string(string, substr, false);
+    test_case(strcmp(string->content, s24) == 0, idx);          // case-5
+    test_case(string->length == 25, idx);                       // case-6    
+    show_result();
+    
+
+    /* ----- Check for count_uc_string ----- */
+    pass = 0; cases = 1; idx = 0;
+    print_header(msgs[18]);
+
+    CHAR s25[] = "#GeeKs01fOr@gEEks07";
+    INT count;
+
+    free(string);
+    string = create_string_wc(s25);
+    count = count_uc_string(string);
+    test_case(count == 5, idx);                                 // case-1
+    show_result();
+
+
+    /* ----- Check for count_lc_string ----- */
+    pass = 0; cases = 1; idx = 0;
+    print_header(msgs[19]);
+
+    count = count_lc_string(string);
+    test_case(count == 8, idx);                                 // case-1
+    show_result();
+
+
+    /* ----- Check for count_num_string ----- */
+    pass = 0; cases = 1; idx = 0;
+    print_header(msgs[20]);
+
+    count = count_num_string(string);
+    test_case(count == 4, idx);                                 // case-1
+    show_result();
+
+
+    /* ----- Check for count_spc_string ----- */
+    pass = 0; cases = 1; idx = 0;
+    print_header(msgs[21]);
+
+    count = count_spc_string(string);
+    test_case(count == 2, idx);                                 // case-1
+    show_result();
+
+
+    /* ----- Check for check_pangram ----- */
+    pass = 0; cases = 3, idx = 0;
+    print_header(msgs[22]);
+    CHAR s26[] = "The quick brown fox jumps over the lazy dog";
+    CHAR s27[] = "The quick brown fox jumped over the lazy dog";
+ 
+    test_case(check_pangram_lipogram(string, false, false) == 0, idx);  // case-1
+    free(string);
+    string = create_string_wc(s26);
+    test_case(check_pangram_lipogram(string, false, false) == 1, idx);  // case-2
+
+    free(string);
+    string = create_string_wc(s27);
+    test_case(check_pangram_lipogram(string, true, false) == 2, idx);   // case-3
+    show_result();
+
+
+    /* ----- Check for min_window_substr ----- */
+    pass = 0; cases = 3; idx = 0;
+    print_header(msgs[23]);
+
+    str_t *pattern;
+    CHAR s28[] = "this is a test string";
+    CHAR s29[] = "tist";
+    CHAR s30[] = "t stri";
+    CHAR s31[] = "this is a test strings";
+    CHAR s32[] = "xenon";
+
+    free(substr);
+    free(string);
+    string = create_string_wc(s28);
+    pattern = create_string_wc(s29);
+    substr = min_window_substr(string, pattern);
+    test_case(strcmp(substr->content, s30) == 0, idx);          // case-1
+
+    free(substr);
+    free(pattern);
+    pattern = create_string_wc(s31);
+    substr = min_window_substr(string, pattern);
+    test_case(substr == NULL, idx);                             // case-2
+
+    free(substr);
+    free(pattern);
+    pattern = create_string_wc(s32);
+    substr = min_window_substr(string, pattern);
+    test_case(substr == NULL, idx);                             // case-3
+    show_result();
 
     return 0;
 }

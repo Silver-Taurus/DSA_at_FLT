@@ -64,17 +64,17 @@ str_t* substr_from_string (str_t *string, INT start_pos);
 // check for the case
 INT substr_in_string (str_t *string, str_t *substr, bool_t check_case);
 
-// Function to find the start pos of all the occurences of substr in  a dynamic string
+// Function to find the start pos of all the occurrences of substr in  a dynamic string
 iarr_t* substr_all_in_string (str_t *string, str_t *substr, bool_t check_case);
 
 // Function to insert data at some position in a dynamic string
 bool_t insert_at_string (str_t *string, INT pos, CHAR *content);
 
-// Function to replace all character occurences with a new character in a dynamic string and also
+// Function to replace all character occurrences with a new character in a dynamic string and also
 // check for the case
 void replace_ch_string (str_t *string, CHAR ch, CHAR new_ch, bool_t check_case);
 
-// Function to remove all character occurences in a dynamic string and also check for the case
+// Function to remove all character occurrences in a dynamic string and also check for the case
 void remove_ch_string (str_t *string, CHAR ch, bool_t check_case);
 
 // Function to remove between a start pos and end pos including the end pos in a dynamic string
@@ -89,12 +89,28 @@ bool_t remove_at_string (str_t *string, INT pos);
 // Function to remove first occurence of substr in a dynamic string and also check for the case
 void remove_in_string (str_t *string, str_t *substr, bool_t check_case); 
 
-// Function to remove all the occurences of substr in a dynamic string and also check the case
+// Function to remove all the occurrences of substr in a dynamic string and also check the case
 void remove_all_in_string (str_t *string, str_t *substr, bool_t check_case);
+
+// Function to count uppercase characters in string
+INT count_uc_string (str_t *string);
+
+// Function to count lowercase characters in string
+INT count_lc_string (str_t *string);
+
+// Function to count number characters in string
+INT count_num_string (str_t *string);
+
+// Function to count special characters in string
+INT count_spc_string (str_t *string);
 
 // Function to check whether a string is a "Pangram" or "holoalphabetic" as well as a
 // "pangrammatic liporgram" and print the missing alphabets if asked
 INT check_pangram_lipogram (str_t *string, bool_t check_lipogram, bool_t print_missing);
+
+// Function to find the min. window substr in a dynamic string that contains all the
+// characters of a given patter
+str_t* min_window_substr (str_t *string, str_t *pattern);
 
 // Function to flush the stdin
 void flush_stdin ();

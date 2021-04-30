@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include <limits.h>
 
 str_t* create_string () {
     str_t *new_string = (str_t *) malloc(sizeof(str_t));
@@ -242,7 +243,7 @@ iarr_t* substr_all_in_string (str_t *string, str_t *substr, bool_t check_case) {
                 if (pos == -1)
                     pos = index1;          
 
-                // If one occurence is recorded, reset for finding next occurence
+                // If one occurrences is recorded, reset for finding next occurrences
                 if (index2 == substr->length) {
                     append_iarray(int_arr, pos);
                     index2 = 0;
@@ -267,7 +268,7 @@ iarr_t* substr_all_in_string (str_t *string, str_t *substr, bool_t check_case) {
                 if (pos == -1)
                     pos = index1;
 
-                // If one occurence is recorded, reset for finding next occurence
+                // If one occurrences is recorded, reset for finding next occurrences
                 if (index2 == substr->length) {
                     append_iarray(int_arr, pos);
                     index2 = 0;
@@ -346,7 +347,7 @@ bool_t insert_at_string (str_t *string, INT pos, CHAR *content) {
 void replace_ch_string (str_t *string, CHAR ch, CHAR new_ch, bool_t check_case) {
     INT index;
 
-    // Replace all the occurences of a given character with a new character
+    // Replace all the occurrences of a given character with a new character
     for (index = 0; index < string->length; index++) {
         // Check the case
         if (check_case) {
@@ -433,10 +434,8 @@ bool_t remove_from_string (str_t *string, INT pos) {
 }
 
 bool_t remove_at_string (str_t *string, INT pos) {
-    INT index;
-    CHAR *new_content;
-
-    
+    // Perform remove_at using the remove_btw
+    return remove_btw_string(string, pos, pos);
 }
 
 void remove_in_string (str_t *string, str_t *substr, bool_t check_case) {
@@ -461,12 +460,93 @@ void remove_in_string (str_t *string, str_t *substr, bool_t check_case) {
 
     new_content[length] = '\0';
 
-    // Free the old content and store the new content
+    // Free the old content and store the new content, also update the length
     free(string->content);
     string->content = new_content;
+    string->length = length;
 }
 
-// void remove_all_in_string (str_t *string, str_t *substr, bool_t check_case);
+void remove_all_in_string (str_t *string, str_t *substr, bool_t check_case) {
+    iarr_t *positions;
+    INT index1, length = 0, index2;
+    CHAR *new_content;
+
+    // Create new content based on string's content
+    new_content = (CHAR *) malloc(str_cap_size(string));
+
+    // Get the start position of substr in string
+    positions = substr_all_in_string(string, substr, check_case);
+
+    // Check for the case - if substr is not found in string
+    if (positions == NULL)
+        return;
+
+    // If the position is found make a new content with the removed substr
+    for (index1 = 0, index2 = 0; index1 < string->length; index1++) {
+        if (!(index1 >= positions->arr[index2] && index1 < substr->length + positions->arr[index2]))
+            new_content[length++] = string->content[index1];
+
+        // Once the first position is over, move on to second substr position
+        else if (index1 == substr->length + positions->arr[index2] - 1)
+            index2++;
+    }
+
+    new_content[length] = '\0';
+
+    // Free the old content and store the new content, also update the length
+    free(string->content);
+    string->content = new_content;
+    string->length = length;
+}
+
+INT count_uc_string (str_t *string) {
+    INT index, count = 0;
+
+    // Count for uppercase characters
+    for (index = 0; index < string->length; index++)
+        if (isupper(string->content[index]))
+            count++;
+
+    return count;
+}
+
+INT count_lc_string (str_t *string) {
+    INT index, count = 0;
+
+    // Count for lowercase characters
+    for (index = 0; index < string->length; index++)
+        if (islower(string->content[index]))
+            count++;
+
+    return count;
+}
+
+INT count_num_string (str_t *string) {
+    INT index, count = 0;
+
+    // Count for number characters
+    for (index = 0; index < string->length; index++)
+        if (isdigit(string->content[index]))
+            count++;
+
+    return count;
+}
+
+INT count_spc_string (str_t *string) {
+    INT index, count = 0;
+
+    // Count for special characters
+    for (index = 0; index < string->length; index++)
+        if (
+            (string->content[index] >= 32 && string->content[index] <=47) 
+            || (string->content[index] >= 58 && string->content[index] <= 64)
+            || (string->content[index] >= 91 && string->content[index] <= 96)
+            || (string->content[index] >= 123 && string->content[index] <= 126)
+        )
+            count++;
+
+    return count;
+}
 
 INT check_pangram_lipogram (str_t *string, bool_t check_lipogram, bool_t print_missing) {
     // Declare the character mapping to mark the presence of each alphabet
@@ -506,8 +586,57 @@ INT check_pangram_lipogram (str_t *string, bool_t check_lipogram, bool_t print_m
     return 0;
 }
 
+str_t* min_window_substr (str_t *string, str_t *pattern) {
+    INT hash_pat[256] = {0}, hash_str[256] = {0}, index, count = 0;
+    INT pos = 0, win_len,  min_len = INT_MAX, start = -1;
+
+    // If pattern is longer than the string, return NULL
+    if (string->length < pattern->length)
+        return NULL;
+
+    // Record the character occurrences in pattern
+    for (index = 0; index < pattern->length; index++)
+        hash_pat[(int) pattern->content[index]]++;
+
+    // Traverse the string, record characters, match the pattern and then minimize window
+    for (index = 0; index < string->length; index++) {
+        // Record the character occurence in string
+        hash_str[(int) string->content[index]]++;
+
+        // Check if the character of string is there in pattern and count of character
+        // occurred in string hash is less than or equal to that of pattern hash with
+        // the current has count, if so increase the substr count
+        if (hash_str[(int) string->content[index]] <= hash_pat[(int) string->content[index]])
+            count++;
+
+        // If the characters hash count are matched
+        if (count == pattern->length) {
+            // Try to minimize the window
+            while (
+                (hash_str[(int) string->content[pos]] > hash_pat[(int) string->content[pos]])
+                || (hash_str[(int) string->content[pos]] == 0)
+            ) {
+                // If the character in string exists in pattern and its count is more than required
+                if (hash_str[(int) string->content[pos]] > hash_pat[(int) string->content[pos]])
+                    hash_str[(int) string->content[pos]]--;
+
+                pos++;
+            }
+
+            // Update the window length
+            win_len = index - pos + 1;
+            if (win_len < min_len) {
+                min_len = win_len;
+                start = pos;
+            }
+        }
+    }
+
+    // Get and reutrn the substr based on the start position of the min. window
+    return substr_btw_string(string, start, start + min_len - 1);
+}
+
 void flush_stdin () {
-    //Declare the input character
     CHAR input;
 
     // Flush the data remaining in the stdin input buffer
