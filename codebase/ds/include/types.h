@@ -10,6 +10,9 @@ typedef char CHAR;
 #define INT_FS "%d"
 #define STR_FS "%s"
 
+/* ---------- Creating macros for constants to be used in program ---------- */
+#define LEN 8
+
 // Creating macros for functionality to be used in program
 #define chout(ch) fprintf(stdout, CHAR_FS, ch)
 #define strout(str) fprintf(stdout, STR_FS, str)

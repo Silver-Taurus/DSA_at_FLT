@@ -18,7 +18,8 @@ LDFLAGS		=
 LIBS		=
 
 # Define the C source files
-SRCS		=	src/dstrings.c
+SRCS		=	src/dstring.c		\
+				src/dintarr.c
 
 # Define the C object files for the source files
 # Also, creates object files from the source due to the
@@ -30,14 +31,14 @@ SRC_OBJS	=	$(SRCS:.c=.o)
 OBJS 		= 	$(SRC_OBJS:src/%.o=obj/%.o)
 
 # Define the C test files
-TEST_SRCS	=	test/dstrings_test.c
+TEST_SRCS	=	test/dstring_test.c
 
 # Create object files for test files
 TEST_OBJS	=	$(TEST_SRCS:.c=.o)	
 
 # Define the executable file names (test files) based on test
 # soruce files
-TEST_NAMES	=	run/dstrings_test
+TEST_NAMES	=	run/dstring_test
 
 
 # ----- Functionality -----

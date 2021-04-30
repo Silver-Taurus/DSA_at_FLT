@@ -1,4 +1,5 @@
-#include "dstrings.h"
+#include "dstring.h"
+#include "dintarr.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,7 +9,7 @@ str_t* create_string () {
     str_t *new_string = (str_t *) malloc(sizeof(str_t));
     
     // Initializing the fields
-    new_string->cap = STR_LEN;
+    new_string->cap = LEN;
     new_string->length = 0;
     
     // Creating the content field amd then initialize it
@@ -68,39 +69,6 @@ void input_string (str_t *string) {
     } while (input != '\n');
 }
 
-void set_string (str_t *string, CHAR *content) {
-    INT length = 0, index;
-
-    // Find the length of the content
-    calc_content_len(content, length);
-
-    // Check whether the string is empty or not, if not empty it
-    if (string->length > 0) {
-        free(string->content);
-
-        // Initialize the length
-        string->length = 0;
-    }
-
-    // Initialize the cap size for cap calculation
-    string->cap = STR_LEN;
-
-    // Change the cap size to the required size
-    set_str_cap(string, length);
-    
-    // Create a new content
-    string->content = (CHAR *) malloc(str_cap_size(string));
-
-    // Initialize it with 0
-    memset(string->content, 0, str_cap_size(string));
-        
-    // Now set the content to the string's content
-    for (index = 0; index < length; index++)
-        string->content[string->length++] = content[index];
-    
-    string->content[string->length] = '\0';
-}
-
 void append_string (str_t *string, CHAR *content) {
     INT index, length = 0;
     CHAR *new_content;
@@ -131,6 +99,39 @@ void append_string (str_t *string, CHAR *content) {
     }
 }
 
+void set_string (str_t *string, CHAR *content) {
+    INT length = 0, index;
+
+    // Find the length of the content
+    calc_content_len(content, length);
+
+    // Check whether the string is empty or not, if not empty it
+    if (string->length > 0) {
+        free(string->content);
+
+        // Initialize the length
+        string->length = 0;
+    }
+
+    // Initialize the cap size for cap calculation
+    string->cap = LEN;
+
+    // Change the cap size to the required size
+    set_str_cap(string, length);
+    
+    // Create a new content
+    string->content = (CHAR *) malloc(str_cap_size(string));
+
+    // Initialize it with 0
+    memset(string->content, 0, str_cap_size(string));
+        
+    // Now set the content to the string's content
+    for (index = 0; index < length; index++)
+        string->content[string->length++] = content[index];
+    
+    string->content[string->length] = '\0';
+}
+
 str_t* substr_btw_string (str_t *string, INT start_pos, INT end_pos) {
     INT index, length = 0;
     str_t *substr; 
@@ -153,7 +154,7 @@ str_t* substr_btw_string (str_t *string, INT start_pos, INT end_pos) {
     // Create empty substr and initialize fields
     substr = (str_t *) malloc(sizeof(str_t));
     substr->length = 0;
-    substr->cap = STR_LEN;
+    substr->cap = LEN;
 
     // Change the substr cap size to the required size
     set_str_cap(substr, length + 1);
@@ -172,7 +173,121 @@ str_t* substr_btw_string (str_t *string, INT start_pos, INT end_pos) {
 
 str_t* substr_from_string (str_t *string, INT start_pos) {
     // Get the substr_from using the substr_btw
-    return substr_btw_string (string, start_pos, string->length - 1);
+    return substr_btw_string(string, start_pos, string->length - 1);
+}
+
+
+INT substr_in_string (str_t *string, str_t *substr, bool_t check_case) {
+    INT index1, index2, pos = -1;
+
+    // Find the substr in string and record the start position of substr in string
+    for (index1 = 0, index2 = 0; index1 < string->length && index2 < substr->length; index1++) {
+        // Check for the case
+        if (check_case) {
+            // If any match occurs start the substr index counter
+            if (string->content[index1] == substr->content[index2]) {
+                index2++;
+
+                // Set the position to mark the start of substr in string if initially -1
+                if (pos == -1)
+                    pos = index1;           
+            }
+
+            // Reset the substr counter if any mismatch occurs and also reset the position
+            else {
+                index2 = 0;
+                pos = -1;
+            }    
+        }
+
+        // Irrespective of case
+        else {
+            // If any match occurs start the substr index counter
+            if (tolower(string->content[index1]) == tolower(substr->content[index2])) {
+                index2++;
+
+                // Set the position to mark the start of substr in string if initially -1
+                if (pos == -1)
+                    pos = index1;
+            }
+
+            // Reset the substr counter if any mismatch occurs and also reset the position
+            else {
+                index2 = 0;
+                pos = -1;
+            }    
+        }
+    }
+
+    // Check for position if the index1 is over and index2 is not over
+    if (index2 != substr->length)
+        pos = -1;
+
+    return pos;
+}
+
+iarr_t* substr_all_in_string (str_t *string, str_t *substr, bool_t check_case) {
+    INT index1, index2, pos = -1;
+    iarr_t *int_arr = create_iarray();
+    
+    // Find the substr in string and record the start position of substr in string
+    for (index1 = 0, index2 = 0; index1 < string->length; index1++) {
+        // Check for the case
+        if (check_case) {
+            // If any match occurs start the substr index counter
+            if (string->content[index1] == substr->content[index2]) {
+                index2++;
+
+                // Set the position to mark the start of substr in string if initially -1
+                if (pos == -1)
+                    pos = index1;          
+
+                // If one occurence is recorded, reset for finding next occurence
+                if (index2 == substr->length) {
+                    append_iarray(int_arr, pos);
+                    index2 = 0;
+                    pos = -1;
+                }
+            }
+
+            // Reset the substr counter if any mismatch occurs and also reset the position
+            else {
+                index2 = 0;
+                pos = -1;
+            }    
+        }
+
+        // Irrespective of case
+        else {
+            // If any match occurs start the substr index counter
+            if (tolower(string->content[index1]) == tolower(substr->content[index2])) {
+                index2++;
+
+                // Set the position to mark the start of substr in string if initially -1
+                if (pos == -1)
+                    pos = index1;
+
+                // If one occurence is recorded, reset for finding next occurence
+                if (index2 == substr->length) {
+                    append_iarray(int_arr, pos);
+                    index2 = 0;
+                    pos = -1;
+                }
+            }
+
+            // Reset the substr counter if any mismatch occurs and also reset the position
+            else {
+                index2 = 0;
+                pos = -1;
+            }    
+        }
+    }
+
+    // Check for the empty case
+    if (!int_arr->length)
+        return NULL;
+
+    return int_arr;
 }
 
 bool_t insert_at_string (str_t *string, INT pos, CHAR *content) {
@@ -271,61 +386,60 @@ void remove_ch_string (str_t *string, CHAR ch, bool_t check_case) {
 
     new_content[length] = '\0';
 
-    // Free the old content and store the new content
+    // Free the old content and store the new content, also update the length
     free(string->content);
     string->content = new_content;
+    string->length = length;
 }
 
-INT substr_in_string (str_t *string, str_t *substr, bool_t check_case) {
-    INT index1, index2, pos = -1;
+bool_t remove_btw_string (str_t *string, INT start_pos, INT end_pos) {
+    INT index, length = 0;
+    CHAR *new_content;
 
-    // Find the substr in string and record the start position of substr in string
-    for (index1 = 0, index2 = 0; index1 < string->length && index2 < substr->length; index1++) {
-        // Check for the case
-        if (check_case) {
-            // If any match occurs start the substr index counter
-            if (string->content[index1] == substr->content[index2]) {
-                index2++;
+    // Check for the valid start position, if not return false
+    if (!check_substr_pos(string, start_pos))
+        return false;
 
-                // Set the position to mark the start of substr in string if initially -1
-                if (pos == -1)
-                    pos = index1;
-            }
+    // Check for the valid end position, if not return false
+    if (!check_substr_pos(string, end_pos))
+        return false;
 
-            // Reset the substr counter if any mismatch occurs and also reset the position
-            else {
-                index2 = 0;
-                pos = -1;
-            }    
-        }
+    // Check for start and end position
+    if (start_pos > end_pos)
+        return false;
 
-        // Irrespective of case
-        else {
-            // If any match occurs start the substr index counter
-            if (tolower(string->content[index1]) == tolower(substr->content[index2])) {
-                index2++;
+    // Create new content to store removed string and initialize it
+    new_content = (CHAR *) malloc(str_cap_size(string));
+    memset(new_content, 0, str_cap_size(string));
 
-                // Set the position to mark the start of substr in string if initially -1
-                if (pos == -1)
-                    pos = index1;
-            }
+    // Copy the required content to the new content
+    for (index = 0; index < string->length; index++)
+        if (!(index >= start_pos && index <= end_pos))
+            new_content[length++] = string->content[index];
 
-            // Reset the substr counter if any mismatch occurs and also reset the position
-            else {
-                index2 = 0;
-                pos = -1;
-            }    
-        }
-    }
+    new_content[length] = '\0';
 
-    // Check for position if the index1 is over and index2 is not over
-    if (index2 != substr->length)
-        pos = -1;
+    // Free the old content and store the new content, also update the length
+    free(string->content);
+    string->content = new_content;
+    string->length = length;
 
-    return pos;
+    return true;
 }
 
-void remove_string (str_t *string, str_t *substr, bool_t check_case) {
+bool_t remove_from_string (str_t *string, INT pos) {
+    // Perform remove_from using the remove_btw
+    return remove_btw_string(string, pos, string->length - 1);
+}
+
+bool_t remove_at_string (str_t *string, INT pos) {
+    INT index;
+    CHAR *new_content;
+
+    
+}
+
+void remove_in_string (str_t *string, str_t *substr, bool_t check_case) {
     INT pos, index, length = 0;
     CHAR *new_content;
 
@@ -351,6 +465,8 @@ void remove_string (str_t *string, str_t *substr, bool_t check_case) {
     free(string->content);
     string->content = new_content;
 }
+
+// void remove_all_in_string (str_t *string, str_t *substr, bool_t check_case);
 
 INT check_pangram_lipogram (str_t *string, bool_t check_lipogram, bool_t print_missing) {
     // Declare the character mapping to mark the presence of each alphabet
