@@ -9,17 +9,23 @@ typedef char CHAR;
 #define CHAR_FS "%c"
 #define INT_FS "%d"
 #define STR_FS "%s"
+#define CHAR_FSS "%c "
+#define INT_FSS "%d "
+#define STR_FSS "%s "
 
 /* ---------- Creating macros for constants to be used in program ---------- */
 #define LEN 8
 
 // Creating macros for functionality to be used in program
-#define chout(ch) fprintf(stdout, CHAR_FS, ch)
-#define strout(str) fprintf(stdout, STR_FS, str)
+#define intout(val) fprintf(stdout, INT_FSS, val)
+#define strout(str) fprintf(stdout, STR_FSS, str)
 #define out(format, data) fprintf(stdout, format, data)
 #define nl() fprintf(stdout, "\n")
+#define flush_stdin() CHAR ip; do { ip = getchar(); } while (ip != '\n')
 
-// Creating a boolean enum
+/* 
+    Creating a boolean enum
+*/
 typedef enum boolen {
     false,
     true
